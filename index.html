@@ -58,6 +58,7 @@
 
     // the angle the turtle rotates by when encountering any symbol translating to a rotation
     angle=22.5°;
+    len=Flen();
   </script>
   <script id="csdraw" type="text/x-cindyscript">
   // errc(rules);
@@ -93,7 +94,7 @@
     position=[0,0,0];
 
     // vector the turtle moves by
-    l = [0.25 * Flen(),0,0];
+    l = [0.25 * len,0,0];
 
     // saved postion, dierection stack
     // you interact with it via the pop() push() functions defenined hereafter

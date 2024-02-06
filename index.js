@@ -1,4 +1,3 @@
-
 var cdy = CindyJS({ 
     ports: [{
         id:"CSCanvas",
@@ -64,6 +63,9 @@ window.addEventListener("load", function () {
     this.document.getElementById("angle").addEventListener("input", (ev) => {
         cdy.evokeCS(`angle = ${ev.target.value}°`);
     })
+    this.document.getElementById("segment-length").addEventListener("input", (ev) => {
+        cdy.evokeCS(`len = ${ev.target.value / 6}`);
+    })
 });
 
 
@@ -100,7 +102,7 @@ CindyJS.registerPlugin(1, "InputPlugin", function(api) {
     api.defineFunction("Flen", 0 , function(args, modifs) {
         return {
             ctype: "number",
-            value: { real: sliders["segment-length"].value / 3, imag: 0}
+            value: { real: sliders["segment-length"].value / 6, imag: 0}
         }
     });
 
