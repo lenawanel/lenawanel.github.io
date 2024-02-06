@@ -49,7 +49,7 @@ window.addEventListener("load", function () {
 
     const color = document.querySelectorAll(".color");
     function getColor() {
-	return (parseInt(color[0].value), parseInt(color[1].value), parseInt(color[2].value));
+	return (parseFloat(color[0].value), parseFloat(color[1].value), parseFloat(color[2].value));
     }
 
     cdy.evokeCS(`rules=${getRules()}; s=lsystem(its(), word(), rules);`);
