@@ -63,7 +63,7 @@
   <script id="csdraw" type="text/x-cindyscript">
   // errc(rules);
   // errc(rules_"F");
-  errc(s);
+  // errc(s);
 
   // the functions generating rotation matrices around the axis
   // as described on page 19
@@ -149,8 +149,8 @@
           draw3d(position, newPosition, size->size);
           position = newPosition;
         ), 
-          draw((0,0), (0,Flen()));
-          translate((0,Flen()));
+          draw((0,0), (0,len));
+          translate((0,len));
         );
         // move forward by l in the direction of the direction matrix
         // add the posistion to the vertices
@@ -213,7 +213,7 @@
 
     // if(!turtle3D, drawimage([0,0], [0,8],  "turtle"), drawsphere3d(position, 0.1, color->[1,0,0]));
     if(turtle3D, end3d());
-    errc(its());
+    //errc(its());
 
   </script>
 
