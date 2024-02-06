@@ -114,9 +114,9 @@
     // location and direcion accordingly
     pop():=if(turtle3D, (
       // length = length(stack);
-      len = length(stack);
+      slen = length(stack);
       // get the last element
-      elem = stack_(len);
+      elem = stack_(slen);
 
       // we need to manually create a new list here, because cindys 
       // remove function would remove any occurance of the element
@@ -211,7 +211,7 @@
         );
         list(s);
 
-    if(!turtle3D, drawimage([0,0], [0,8],  "turtle"), drawsphere3d(position, 0.1, color->[1,0,0]));
+    if(!turtle3D, drawimage([-1, 0], [1, 0],  "turtle"), drawsphere3d(position, 0.1, color->[1,0,0]));
     if(turtle3D, end3d());
     // errc(its());
 
