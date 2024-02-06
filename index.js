@@ -129,10 +129,18 @@ function switch_mode() {
     }
     const canvas2d = document.getElementById("CSCanvas");
     const canvas3d = document.getElementById("Cindy3D");
+    const button = document.getElementById("dimswitcher");
+
 
     toggle_display(canvas2d);
     toggle_display(canvas3d);
 
+    if(button.innerText == "3D mode") {
+	button.textContent = "2D mode";
+	console.log("here")
+    } else {
+	button.textContent = "3D mode";
+    }
     cdy.evokeCS("turtle3D = !turtle3D");
 }
 
