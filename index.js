@@ -49,7 +49,7 @@ window.addEventListener("load", function () {
 
     const color = document.querySelectorAll(".color");
     function getColor() {
-	return (parseFloat(color[0].value), parseFloat(color[1].value), parseFloat(color[2].value));
+	return [parseFloat(color[0].value), parseFloat(color[1].value), parseFloat(color[2].value)];
     }
 
     cdy.evokeCS(`rules=${getRules()}; s=lsystem(its(), word(), rules);`);
@@ -70,10 +70,11 @@ window.addEventListener("load", function () {
         cdy.evokeCS(`angle = ${ev.target.value}°`);
     })
     this.document.getElementById("segment-length").addEventListener("input", (ev) => {
-        cdy.evokeCS(`len = ${ev.target.value / 6}`);
+        cdy.evokeCS(`len = ${ev.target.value / 15}`);
     })
     this.document.getElementById("scolor").addEventListener("input", (_) => {
-        cdy.evokeCS(`color = ${getColor()}`);
+	console.log(`color = ${getColor()}; errc(color)`)
+        cdy.evokeCS(`color = [${getColor()}]; errc(color)`);
     })
 });
 
@@ -111,7 +112,7 @@ CindyJS.registerPlugin(1, "InputPlugin", function(api) {
     api.defineFunction("Flen", 0 , function(args, modifs) {
         return {
             ctype: "number",
-            value: { real: sliders["segment-length"].value / 6, imag: 0}
+            value: { real: sliders["segment-length"].value / 15, imag: 0}
         }
     });
 
