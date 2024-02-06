@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+
+  <title>3D Lsystems</title>
+  <link rel="stylesheet" href="https://cindyjs.org/dist/v0.8.8/CindyJS.css">
+  <script type="text/javascript" src="https://cindyjs.org/dist/v0.8.8/Cindy.js"></script>
+  <script type="text/javascript" src="https://cindyjs.org/dist/v0.8.8/Cindy3D.js"></script>
+
+  <link rel="stylesheet" href="index.css">
+
+  <script id="csinit" type="text/x-cindyscript">
+  use("Cindy3D");
+  use("InputPlugin");
+
+    applyRules(string, rules):=(
+  	  result= "";
+  	  repeat(length(string), 
+  		  symbol = string_#;
+      	rhs    = rules_symbol;
+      	if(isstring(rhs), 
+      		// the production rule is non-probabilistic
+      		result = result + rhs;
+      		,
+      		if(islist(rhs),
+      			// the production rule is non-probabilistic
+      			// construct a list of ranges, spanning [0;1], whose size correpsonds to their corresponding weigths
+      			ranges = [];
+      			forall(rhs, ranges = ranges <: 
+      				[ranges_(length(ranges)), ranges_(length(ranges)) + #_0]);
+      			// pick one of the possible right hand sides
+      			choice = random();
+      			repeat(length(ranges), 
+      				if((choice >= (ranges_#)_0) & (choice < (ranges_#)_1), 
+      					result = result + (rhs_#)_1)
+      			);,
+            result = result + symbol;
+      		)
+      	)
+      );
+      result
+    );
+
+
+    // the production rule
+    // these are currently taken from the book on page 26
+    getRules();
+    errc(rules);
+
+    lsystem(n, s, rules):=(
+      repeat(n,s=applyRules(s,rules));
+    );
+    s = lsystem(its(), word(), rules);
+
+    turtle3D = false; 
+
+    // the angle the turtle rotates by when encountering any symbol translating to a rotation
+    angle=22.5°;
+  </script>
+  <script id="csdraw" type="text/x-cindyscript">
+  // errc(rules);
+  // errc(rules_"F");
+  errc(s);
+
+  // the functions generating rotation matrices around the axis
+  // as described on page 19
+  ru(angle):=([
+        [cos(angle),  sin(angle), 0],
+        [-sin(angle), cos(angle), 0],
+        [0,          0,           1]]);
+  rl(angle):=([
+        [cos(angle), 0, -sin(angle)],
+        [0,          1,           0],
+        [sin(angle), 0,  cos(angle)]]);
+  rh(angle):=([
+        [1,          0,           0],
+        [0, cos(angle), -sin(angle)],
+        [0, sin(angle),  cos(angle)]]);
+
+
+    // direction matrix to start with
+    // the columns should be unit vectors
+    direction=[
+               [1,0,0],
+               [0,1,0],
+               [0,0,1]
+              ];
+    // make the turtle start pointing up
+    direction=direction * ru(90°);
+    // the starting position
+    position=[0,0,0];
+
+    // vector the turtle moves by
+    l = [0.25 * Flen(),0,0];
+
+    // saved postion, dierection stack
+    // you interact with it via the pop() push() functions defenined hereafter
+    // it is supposed to store them like [[position: Vec3, direction: RotMat3d]]
+    // stack = [[position, direction]];
+    stack = [];
+
+    // push()
+    // push the current location and direction onto the location stack
+    push():=if(turtle3D, (
+      stack = stack :> [position, direction, size];
+    ), gsave()
+    );
+
+    // pop() 
+    // pop an element from the location stack and update the current
+    // location and direcion accordingly
+    pop():=if(turtle3D, (
+      // length = length(stack);
+      len = length(stack);
+      // get the last element
+      elem = stack_(len);
+
+      // we need to manually create a new list here, because cindys 
+      // remove function would remove any occurance of the element
+      newStack = [];
+      repeat(len-1, ,newStack = newStack ++ [stack_#]);
+      stack = newStack;
+
+      // update the postion and direction
+      position=elem_1;
+      direction=elem_2;
+      size=elem_3;
+    ), 
+      grestore()
+    );
+
+    // current polygon sepcified by the f and { commands
+    poly = [];
+
+    // the size of the segments
+    size = 1;
+
+    if(turtle3D, begin3d();
+        background3d([1,1,1]);
+      );
+
+        // move forward by l in the direction of the direction matrix
+        // connect the moved distance with a line afterward
+        forward:=if(turtle3D, (
+          newPosition = position + l * direction;
+          draw3d(position, newPosition, size->size);
+          position = newPosition;
+        ), 
+          draw((0,0), (0,Flen()));
+          translate((0,Flen()));
+        );
+        // move forward by l in the direction of the direction matrix
+        // add the posistion to the vertices
+        // used by f symbol
+        polyForward:=if(turtle3D, (
+          newPosition = position + l * direction;
+          poly = poly :> newPosition;
+          position = newPosition;
+        ));
+
+        // rotation functions
+        // they work by multiplying the direcion matrix with an on the fly generated
+        // matrix encoding rotations around the axes see the r*() funcions for more
+        // around their axes the amount specified in angle
+        left     :=if(turtle3D, (direction=ru(angle)*direction), rotate(-angle));
+        right    :=if(turtle3D, (direction=ru(-angle)*direction), rotate(angle));
+        pitchDown:=if(turtle3D, (direction=rl(angle)*direction));
+        pitchUp  :=if(turtle3D, (direction=rl(-angle)*direction));
+        rollLeft :=if(turtle3D, (direction=rh(angle)*direction));
+        rollRight:=if(turtle3D, (direction=rh(-angle)*direction));
+        turn     :=if(turtle3D, (direction=ru(180°)*direction));
+
+        // match a single character with it's function
+        // ignore it if it doesn't have a corresponding function
+        turtle(x):=(
+          (if(x=="F",forward)); 
+          (if(x=="L",forward)); 
+          (if(x=="+",left));
+          (if(x=="-",right));
+          (if(x=="&",pitchDown));
+          (if(x=="∧",pitchUp));
+          (if(x=="\\",rollLeft));
+          (if(x=="/",rollRight));
+          (if(x=="|",turn));
+          (if(x=="[",push()));
+          (if(x=="]",pop()));
+          (if(x=="!",size = size - 0.1));
+          (if(x=="!",
+          // ignore colors for now
+          ));
+          (if(x=="{",
+            poly=[];
+          ));
+          (if(x=="}",
+            if(turtle3D, fillpoly3d(poly));
+            ));
+          (if(x=="f",polyForward)); 
+        );
+    
+
+
+        // # of iterations to apply the production rules
+        // n = its();
+    
+        // interpret all the characters in a string
+        list(x):=(
+          repeat(length(x),turtle(x_#));
+        );
+        list(s);
+
+    // if(!turtle3D, drawimage([0,0], [0,8],  "turtle"), drawsphere3d(position, 0.1, color->[1,0,0]));
+    if(turtle3D, end3d());
+    errc(its());
+
+  </script>
+
+  <script src="index.js"></script>
+
+</head>
+
+<body>
+  <div class="header">
+    <h1 style="font-weight: 400;">3D L-Systems</h1>
+    <h3></h3>
+  </div>
+  <div class="container">
+    <div class="box">
+  <!-- has multiple text inputs
+  <details>
+    <summary>ok</summary>
+    <input type="text" id="fuck-off">
+    <input type="text" id="fuck-offf">
+    <input type="text" id="fuck-offff">
+  </details>
+-->
+      <canvas id="Cindy3D" style="border: 1px solid #2a2a2a; !important display: inherit;" width="800" height="758"></canvas>
+      <div id="CSCanvas" style="!important display: none; background-color: #ffffff"></div>
+    </div>
+  <div class="box">
+  <div class="alternative" style="height: 760px; overflow-y: auto;">
+    <div class="input">
+    <label for="start">Axiom</label>
+    <input type="text" value="A" id="start">
+    </div>
+    <div class="rules"> 
+    <div class="rule"> 
+      <input type="text" class="pre" maxlength="1" size="1"> → <input type="text" class="post">
+    </div>
+    <div class="rule"> 
+      <input type="text" class="pre" maxlength="1" size="1"> → <input type="text" class="post">
+    </div>
+    <div class="rule"> 
+      <input type="text" class="pre" maxlength="1" size="1"> → <input type="text" class="post">
+    </div>
+    <div class="rule"> 
+      <input type="text" class="pre" maxlength="1" size="1"> → <input type="text" class="post">
+    </div>
+    <div class="rule"> 
+      <input type="text" class="pre" maxlength="1" size="1"> → <input type="text" class="post">
+    </div>
+    </div>
+    <!--
+    <div class="input">
+    <label for="s">S rule</label>
+    <input type="text" value="F L" id="s" class="rule">
+    </div>
+    <div class="input">
+    <label for="a">A rule</label>
+    <input type="text" value="[&FL!A]/////’[&FL!A]///////’[&FL!A]" id="a" class="rule">
+    </div>
+    <div class="input">
+    <label for="l">L rule</label>
+    <input type="text" value="[’’’∧∧{-f+f+f-|-f+f+f}]" id="l" class="rule">
+    </div>
+    <div class="input">
+    <label for="f">F rule</label>
+    <input type="text" value="S ///// F" id="f" class="rule">
+    </div>
+    -->
+    <div class="input">
+      <label for="angle">Angle</label>
+      <input type="text" value="22.5" id="angle" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
+    </div>
+    <!-- two sliders each labelled Something, ids something1 and something2-->
+    <div class="input">
+    <label for="segment-length">Segment length</label>
+    <input type="range" min="0" max="100" value="1" id="segment-length" class="slider">
+    </div>
+    <div class="input">
+    <label for="iteration-count">Iteration Count</label>
+    <input type="range" min="0" max="10" value="5" id="iteration-count" class="slider">
+    </div>
+    <button type="button" id="dimswitcher" onclick="switch_mode()"> 2D </button>
+  </div>
+  </div>
+  <div id="CSCanvas"></div>
+</div>
+</body>
+
+</html>
