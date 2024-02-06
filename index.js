@@ -46,6 +46,12 @@ window.addEventListener("load", function () {
         // console.log(rules_json);
         return rules_json;
     }
+
+    const color = document.querySelectorAll(".color");
+    function getColor() {
+	return (parseInt(color[0].value), parseInt(color[1].value), parseInt(color[2].value));
+    }
+
     cdy.evokeCS(`rules=${getRules()}; s=lsystem(its(), word(), rules);`);
 
     rules.forEach(function(rule) {
@@ -65,6 +71,9 @@ window.addEventListener("load", function () {
     })
     this.document.getElementById("segment-length").addEventListener("input", (ev) => {
         cdy.evokeCS(`len = ${ev.target.value / 6}`);
+    })
+    this.document.getElementById("scolor").addEventListener("input", (_) => {
+        cdy.evokeCS(`color = ${getColor()}`);
     })
 });
 

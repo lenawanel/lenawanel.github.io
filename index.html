@@ -59,6 +59,7 @@
     // the angle the turtle rotates by when encountering any symbol translating to a rotation
     angle=22.5°;
     len=Flen();
+    color = (0.3, 0.75, 0.01);
   </script>
   <script id="csdraw" type="text/x-cindyscript">
   // errc(rules);
@@ -146,10 +147,10 @@
         // connect the moved distance with a line afterward
         forward:=if(turtle3D, (
           newPosition = position + l * direction;
-          draw3d(position, newPosition, size->size);
+          draw3d(position, newPosition, size->size, color->color);
           position = newPosition;
         ), 
-          draw((0,0), (0,len));
+          draw((0,0), (0,len), color->color);
           translate((0,len));
         );
         // move forward by l in the direction of the direction matrix
@@ -283,6 +284,14 @@
     <div class="input">
       <label for="angle">Angle</label>
       <input type="text" value="22.5" id="angle" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
+    </div>
+    <div class="input" id="scolor">
+      <label for="red">red</label>
+      <input class="color" type="text" value="0.3" id="red" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
+      <label for="red">green</label>
+      <input class="color" type="text" value="0.75" id="green" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
+      <label for="red">red</label>
+      <input class="color" type="text" value="0.01" id="blue" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
     </div>
     <!-- two sliders each labelled Something, ids something1 and something2-->
     <div class="input">
