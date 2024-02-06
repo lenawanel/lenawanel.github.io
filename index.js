@@ -6,7 +6,7 @@ var cdy = CindyJS({
         // background: [1, 1, 1]
     }],
     scripts: "cs*",
-    images: {turtle: "file:///home/uwu/Downloads/fo_ab/2198.jpg"}
+    images: {turtle: "./tt.jpg"}
 });
 
 
